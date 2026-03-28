@@ -670,4 +670,36 @@
     else if (sys > 140 || sys < 90 || dia > 90 || dia < 60) el.className = 'vital-status warn';
     else el.className = 'vital-status ok';
   }
+ function sendData() {
+    const data = {
+      unitId: document.getElementById('unitId').value,
+      crewLead: document.getElementById('crewLead').value,
+      patientAge: document.getElementById('patientAge').value,
+      heartRate: document.getElementById('heartRate').value,
+      bp: document.getElementById('bp').value,
+      spo2: document.getElementById('spo2').value,
+      pulse: document.getElementById('pulse').value,
+      temp: document.getElementById('temp').value,
+      respRate: document.getElementById('respRate').value,
+      gcs: document.getElementById('gcs').value,
+      glucose: document.getElementById('glucose').value,
+      weight: document.getElementById('weight').value,
+      severity,
+      condition: document.getElementById('condition').value,
+      hospital: document.getElementById('hospital').value,
+      eta: document.getElementById('etaSlider').value,
+      timestamp: new Date().toISOString()
+    };
  
+    localStorage.setItem('ambulanceData', JSON.stringify(data));
+ 
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+ 
+    document.getElementById('lastSent').textContent =
+      'LAST TRANSMISSION: ' + new Date().toTimeString().slice(0,8);
+  }
+</script>
+</body>
+</html>
