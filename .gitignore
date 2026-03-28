@@ -1,4 +1,4 @@
 
-serviceAccountKey.json
+firebaseKey.json
 node_modules/
-.env
+.envfirebaseKey.json
