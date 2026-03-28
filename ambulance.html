@@ -167,3 +167,107 @@
     color: var(--cyan);
     width: 100%;
   }
+  .unit-card select option { background: var(--surface2); color: var(--text); }
+ 
+  /* VITALS GRID */
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+ 
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+ 
+  .vitals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+ 
+  .vital-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+ 
+  .vital-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent, var(--cyan));
+    opacity: 0.6;
+  }
+ 
+  .vital-card:focus-within {
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px rgba(0,229,255,0.1);
+  }
+ 
+  .vital-icon {
+    font-size: 20px;
+    margin-bottom: 8px;
+    display: block;
+  }
+ 
+  .vital-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+ 
+  .vital-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(0,229,255,0.2);
+    outline: none;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    width: 100%;
+    padding-bottom: 4px;
+    transition: border-color 0.2s;
+  }
+ 
+  .vital-input:focus { border-bottom-color: var(--cyan); }
+ 
+  .vital-unit {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    display: block;
+  }
+ 
+  .vital-status {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: background 0.3s;
+  }
