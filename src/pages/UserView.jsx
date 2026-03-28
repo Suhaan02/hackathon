@@ -56,7 +56,7 @@ function UserView() {
         {/* User location - blue dot */}
         <Circle
           center={[12.9716, 77.5946]}
-          radius={30}
+          radius={5}
           pathOptions={{
             color: '#4285F4',
             fillColor: '#4285F4',
@@ -67,7 +67,7 @@ function UserView() {
         {/* Ambulance - red dot */}
         <Circle
           center={ambulancePos}
-          radius={30}
+          radius={5}
           pathOptions={{
             color: '#FF0000',
             fillColor: '#FF0000',

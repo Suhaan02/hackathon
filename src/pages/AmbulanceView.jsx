@@ -1,103 +1,108 @@
-function HospitalView() {
-  const patientData = {
-    unitId: 'AMB-047',
-    heartRate: '92',
-    bp: '140/90',
-    spo2: '94',
-    pulse: '88',
-    temp: '99.2',
-    respRate: '22',
-    gcs: '12',
-    glucose: '160',
-    weight: '70',
-    severity: 'red',
-    condition: 'Patient unconscious, possible cardiac arrest. Given aspirin en route.',
-    hospital: 'KIMS Hospital, Hubli',
-    eta: '8',
-    timestamp: new Date().toISOString()
+import { useEffect, useState } from 'react'
+
+function AmbulanceView() {
+
+  const [data, setData] = useState({
+    heartRate: 92,
+    bpSys: 120,
+    bpDia: 80,
+    spo2: 97,
+    temp: 98.4,
+    pulse: 88,
+    gcs: 15,
+    condition: 'Patient under observation'
+  })
+
+  // 🔁 Smooth variation function (SAFE)
+  const vary = (val, min, max, step = 2) => {
+    let newVal = val + (Math.random() * step * 2 - step)
+    if (newVal < min) newVal = min
+    if (newVal > max) newVal = max
+    return Number(newVal.toFixed(1)) // ALWAYS number
   }
 
+  useEffect(() => {
+
+    const interval = setInterval(() => {
+
+      setData(prev => {
+
+        const updated = {
+          heartRate: Math.round(vary(prev.heartRate, 60, 140, 3)),
+          bpSys: Math.round(vary(prev.bpSys, 100, 150, 3)),
+          bpDia: Math.round(vary(prev.bpDia, 60, 100, 2)),
+          spo2: Math.round(vary(prev.spo2, 90, 100, 1)),
+          temp: vary(prev.temp, 97, 101, 0.2),
+          pulse: Math.round(vary(prev.pulse, 60, 130, 3)),
+          gcs: Math.round(vary(prev.gcs, 10, 15, 1)),
+          condition: prev.condition
+        }
+
+        // 🚑 SEND DATA TO HOSPITAL
+        const payload = {
+          ...updated,
+          bp: `${updated.bpSys}/${updated.bpDia}`,
+          unitId: 'AMB-101',
+          eta: 8,
+          hospital: 'City Hospital',
+          timestamp: new Date().toISOString()
+        }
+
+        localStorage.setItem('patientData', JSON.stringify(payload))
+        localStorage.setItem('ambulanceDataTS', Date.now().toString())
+
+        return updated
+      })
+
+    }, 1000)
+
+    return () => clearInterval(interval)
+  }, [])
+
   return (
-    <div style={{ background: '#050a0f', minHeight: '100vh', color: '#e0f0ff', fontFamily: 'sans-serif', padding: '24px' }}>
-      
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', borderBottom: '1px solid rgba(0,229,255,0.15)', paddingBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ background: '#ff2d2d', borderRadius: '10px', width: '44px', height: '44px', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '22px' }}>🏥</div>
-          <div>
-            <div style={{ fontSize: '24px', fontWeight: '700', letterSpacing: '2px' }}>AMBULANCE<span style={{ color: '#ff2d2d' }}>IQ</span></div>
-            <div style={{ fontSize: '10px', color: '#6a8fa8', letterSpacing: '2px' }}>HOSPITAL DASHBOARD</div>
-          </div>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#6a8fa8' }}>
-          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#00e676', animation: 'blink 1.5s infinite' }}></div>
-          <span>LIVE FEED</span>
+    <div className="min-h-screen bg-[#050a0f] text-[#e0f0ff] p-6">
+
+      {/* HEADER */}
+      <div className="flex justify-between mb-6">
+        <h1 className="text-2xl font-bold">🚑 Ambulance Live Console</h1>
+
+        <div className="text-yellow-400 font-bold animate-pulse">
+          TRANSMITTING...
         </div>
       </div>
 
-      {/* Incoming Alert */}
-      <div style={{ background: '#1a0a0a', border: '1px solid #ff2d2d', borderRadius: '12px', padding: '16px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-        <span style={{ fontSize: '28px' }}>🚨</span>
-        <div>
-          <div style={{ color: '#ff2d2d', fontWeight: '700', fontSize: '16px' }}>INCOMING PATIENT — UNIT {patientData.unitId}</div>
-          <div style={{ color: '#6a8fa8', fontSize: '13px' }}>ETA: {patientData.eta} minutes · Heading to {patientData.hospital}</div>
-        </div>
-        <div style={{ marginLeft: 'auto', background: '#ff2d2d', borderRadius: '8px', padding: '8px 16px', fontWeight: '700', fontSize: '14px', letterSpacing: '2px' }}>
-          🔴 CRITICAL
-        </div>
+      {/* VITALS GRID */}
+      <div className="grid grid-cols-3 gap-4 mb-6">
+
+        <Card label="❤️ Heart Rate" value={data.heartRate} color="text-red-400" />
+        <Card label="🩺 BP" value={`${data.bpSys}/${data.bpDia}`} color="text-cyan-400" />
+        <Card label="🫁 SpO₂" value={data.spo2} color="text-green-400" />
+        <Card label="💓 Pulse" value={data.pulse} color="text-yellow-400" />
+        <Card label="🌡 Temp" value={data.temp} color="text-orange-400" />
+        <Card label="🧠 GCS" value={data.gcs} color="text-purple-400" />
+
       </div>
 
-      {/* Vitals Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '14px', marginBottom: '24px' }}>
-        {[
-          { icon: '❤️', label: 'Heart Rate', value: patientData.heartRate, unit: 'BPM', color: '#ff2d2d' },
-          { icon: '🩺', label: 'Blood Pressure', value: patientData.bp, unit: 'mmHg', color: '#00e5ff' },
-          { icon: '🫁', label: 'SpO₂', value: patientData.spo2, unit: '%', color: '#00e676' },
-          { icon: '💓', label: 'Pulse Rate', value: patientData.pulse, unit: 'BPM', color: '#ffaa00' },
-          { icon: '🌡️', label: 'Body Temp', value: patientData.temp, unit: '°F', color: '#ff9500' },
-          { icon: '🧠', label: 'GCS Score', value: patientData.gcs, unit: '/ 15', color: '#cc44ff' },
-        ].map((vital, i) => (
-          <div key={i} style={{ background: '#0a1520', border: '1px solid rgba(0,229,255,0.15)', borderRadius: '12px', padding: '18px', position: 'relative' }}>
-            <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '3px', background: vital.color, borderRadius: '12px 12px 0 0', opacity: 0.6 }}></div>
-            <span style={{ fontSize: '20px' }}>{vital.icon}</span>
-            <div style={{ fontSize: '10px', color: '#6a8fa8', letterSpacing: '2px', margin: '8px 0' }}>{vital.label.toUpperCase()}</div>
-            <div style={{ fontSize: '28px', fontWeight: '700', color: vital.color }}>{vital.value}</div>
-            <div style={{ fontSize: '11px', color: '#6a8fa8' }}>{vital.unit}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Clinical Notes */}
-      <div style={{ background: '#0a1520', border: '1px solid rgba(0,229,255,0.15)', borderRadius: '12px', padding: '18px', marginBottom: '24px' }}>
-        <div style={{ fontSize: '12px', color: '#6a8fa8', letterSpacing: '3px', marginBottom: '10px' }}>CLINICAL NOTES</div>
-        <div style={{ fontSize: '14px', lineHeight: '1.6', color: '#e0f0ff' }}>{patientData.condition}</div>
-      </div>
-
-      {/* Fake AI Analysis */}
-      <div style={{ background: '#0a1520', border: '1px solid #ffaa00', borderRadius: '12px', padding: '18px', marginBottom: '24px' }}>
-        <div style={{ fontSize: '12px', color: '#ffaa00', letterSpacing: '3px', marginBottom: '12px' }}>🧠 AI PRELIMINARY ANALYSIS</div>
-        <div style={{ fontSize: '14px', color: '#e0f0ff', marginBottom: '8px' }}>Likely Condition: <span style={{ color: '#ff2d2d', fontWeight: '700' }}>Possible Cardiac Arrest</span></div>
-        <div style={{ fontSize: '13px', color: '#6a8fa8', marginBottom: '12px' }}>Equipment Required:</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '16px' }}>
-          {['Defibrillator', 'Oxygen Cylinder', 'IV Line Kit', 'Cardiac Monitor'].map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
-              <span style={{ color: '#00e676' }}>✅</span> {item}
-            </div>
-          ))}
-        </div>
-        <div style={{ fontSize: '13px', color: '#e0f0ff', marginBottom: '12px' }}>Is your hospital equipped and ready?</div>
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button style={{ flex: 1, padding: '12px', background: '#00e676', border: 'none', borderRadius: '8px', color: '#000', fontWeight: '700', fontSize: '14px', cursor: 'pointer', letterSpacing: '1px' }}>
-            ✅ YES, WE'RE READY
-          </button>
-          <button style={{ flex: 1, padding: '12px', background: '#ff2d2d', border: 'none', borderRadius: '8px', color: '#fff', fontWeight: '700', fontSize: '14px', cursor: 'pointer', letterSpacing: '1px' }}>
-            ❌ NO — REROUTE
-          </button>
-        </div>
+      {/* NOTES */}
+      <div className="bg-[#0a1520] p-4 rounded-lg border border-cyan-500/20">
+        <div className="text-xs text-gray-400 mb-2">CLINICAL NOTES</div>
+        <div>{data.condition}</div>
       </div>
 
     </div>
   )
 }
 
-export default HospitalView
+// 🔹 Card Component (SAFE)
+function Card({ label, value, color }) {
+  return (
+    <div className="bg-[#0a1520] p-4 rounded-lg border border-cyan-500/20">
+      <div className="text-xs text-gray-400">{label}</div>
+      <div className={`text-xl font-bold ${color}`}>
+        {value ?? '--'}
+      </div>
+    </div>
+  )
+}
+
+export default AmbulanceView
