@@ -8,8 +8,7 @@ const fs = require("fs");
 // --------------------
 // 1️⃣ Firebase Setup
 // --------------------
-const serviceAccount = JSON.parse(fs.readFileSync("./firebaseKey.json", "utf8"));
-
+const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
 });
@@ -53,4 +52,5 @@ io.on("connection", (socket) => {
 // 4️⃣ Start server
 // --------------------
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
+// CORRECT — use PORT variable
+server.listen(PORT, '0.0.0.0', () => console.log(`🚀 Server running on http://localhost:${PORT}`));
