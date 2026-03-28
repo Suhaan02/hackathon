@@ -520,4 +520,154 @@
       <input class="vital-input" type="number" placeholder="72" id="heartRate" oninput="checkVital('heartRate',60,100,'s-hr')" />
       <span class="vital-unit">BPM</span>
     </div>
+  <div class="vital-card" style="--accent:#00e5ff;">
+      <div class="vital-status" id="s-bp"></div>
+      <span class="vital-icon">🩺</span>
+      <span class="vital-label">Blood Pressure</span>
+      <input class="vital-input" type="text" placeholder="120/80" id="bp" oninput="checkBP()" />
+      <span class="vital-unit">mmHg (sys/dia)</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#00e676;">
+      <div class="vital-status" id="s-spo2"></div>
+      <span class="vital-icon">🫁</span>
+      <span class="vital-label">SpO₂ (Oxygen)</span>
+      <input class="vital-input" type="number" placeholder="98" id="spo2" oninput="checkVital('spo2',95,100,'s-spo2')" />
+      <span class="vital-unit">%</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ffaa00;">
+      <div class="vital-status" id="s-pulse"></div>
+      <span class="vital-icon">💓</span>
+      <span class="vital-label">Pulse Rate</span>
+      <input class="vital-input" type="number" placeholder="70" id="pulse" oninput="checkVital('pulse',60,100,'s-pulse')" />
+      <span class="vital-unit">BPM</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ff9500;">
+      <div class="vital-status" id="s-temp"></div>
+      <span class="vital-icon">🌡️</span>
+      <span class="vital-label">Body Temp</span>
+      <input class="vital-input" type="number" placeholder="98.6" step="0.1" id="temp" oninput="checkVital('temp',97,99,'s-temp')" />
+      <span class="vital-unit">°F</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#cc44ff;">
+      <div class="vital-status" id="s-rr"></div>
+      <span class="vital-icon">🫀</span>
+      <span class="vital-label">Resp. Rate</span>
+      <input class="vital-input" type="number" placeholder="16" id="respRate" oninput="checkVital('respRate',12,20,'s-rr')" />
+      <span class="vital-unit">breaths/min</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#00e5ff;">
+      <div class="vital-status" id="s-gcs"></div>
+      <span class="vital-icon">🧠</span>
+      <span class="vital-label">GCS Score</span>
+      <input class="vital-input" type="number" placeholder="15" min="3" max="15" id="gcs" oninput="checkVital('gcs',13,15,'s-gcs')" />
+      <span class="vital-unit">/ 15 (consciousness)</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ff2d2d;">
+      <div class="vital-status" id="s-glucose"></div>
+      <span class="vital-icon">🩸</span>
+      <span class="vital-label">Blood Glucose</span>
+      <input class="vital-input" type="number" placeholder="90" id="glucose" oninput="checkVital('glucose',70,140,'s-glucose')" />
+      <span class="vital-unit">mg/dL</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ffaa00;">
+      <div class="vital-status"></div>
+      <span class="vital-icon">⚖️</span>
+      <span class="vital-label">Patient Weight</span>
+      <input class="vital-input" type="number" placeholder="70" id="weight" />
+      <span class="vital-unit">kg</span>
+    </div>
+ 
+  </div>
+ 
+  <!-- SEVERITY -->
+  <div class="section-title">Triage Severity</div>
+  <div class="severity-row" style="margin-bottom:28px;">
+    <div class="sev-btn" data-sev="green" onclick="setSev(this)">🟢 MINOR</div>
+    <div class="sev-btn" data-sev="yellow" onclick="setSev(this)">🟡 DELAYED</div>
+    <div class="sev-btn" data-sev="orange" onclick="setSev(this)">🟠 URGENT</div>
+    <div class="sev-btn" data-sev="red" onclick="setSev(this)">🔴 CRITICAL</div>
+  </div>
+ 
+  <!-- CONDITION -->
+  <div class="section-title">Clinical Notes</div>
+  <div class="condition-area">
+    <textarea class="condition-textarea" id="condition" placeholder="Describe patient condition, symptoms, incident details, medications given en route..."></textarea>
+  </div>
+ 
+  <!-- HOSPITAL + ETA -->
+  <div class="section-title">Dispatch Info</div>
+  <div class="bottom-row">
+    <div class="hospital-select">
+      <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:2px;">TARGET HOSPITAL</label>
+      <select id="hospital">
+        <option>KIMS Hospital, Hubli</option>
+        <option>SDM Medical College</option>
+        <option>Navodaya Medical College</option>
+        <option>ESIC Hospital, Hubli</option>
+        <option>District Hospital, Dharwad</option>
+      </select>
+    </div>
+    <div class="eta-card">
+      <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:2px;">ETA TO HOSPITAL</label>
+      <div class="eta-display">
+        <span class="eta-num" id="etaDisplay">8</span>
+        <span class="eta-unit-text">MINUTES</span>
+      </div>
+      <input type="range" class="eta-slider" min="1" max="60" value="8" id="etaSlider" oninput="document.getElementById('etaDisplay').textContent=this.value" />
+    </div>
+  </div>
+ 
+  <!-- SEND -->
+  <button class="send-btn" onclick="sendData()">
+    🚨 &nbsp; TRANSMIT TO HOSPITAL
+  </button>
+ 
+  <div class="timer" id="lastSent">LAST TRANSMISSION: —</div>
+</div>
+ 
+<!-- TOAST -->
+<div class="toast" id="toast">✅ &nbsp; DATA TRANSMITTED SUCCESSFULLY</div>
+ 
+<script>
+  let severity = '';
+ 
+  function clock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toTimeString().slice(0,8);
+  }
+  setInterval(clock, 1000); clock();
+ 
+  function setSev(el) {
+    document.querySelectorAll('.sev-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    severity = el.dataset.sev;
+  }
+ 
+  function checkVital(id, low, high, statusId) {
+    const val = parseFloat(document.getElementById(id).value);
+    const el = document.getElementById(statusId);
+    if (!val) { el.className = 'vital-status'; return; }
+    if (val < low * 0.85 || val > high * 1.15) el.className = 'vital-status crit';
+    else if (val < low || val > high) el.className = 'vital-status warn';
+    else el.className = 'vital-status ok';
+  }
+ 
+  function checkBP() {
+    const val = document.getElementById('bp').value;
+    const el = document.getElementById('s-bp');
+    const parts = val.split('/');
+    if (parts.length !== 2) { el.className = 'vital-status'; return; }
+    const sys = parseInt(parts[0]), dia = parseInt(parts[1]);
+    if (sys > 180 || sys < 80 || dia > 120 || dia < 50) el.className = 'vital-status crit';
+    else if (sys > 140 || sys < 90 || dia > 90 || dia < 60) el.className = 'vital-status warn';
+    else el.className = 'vital-status ok';
+  }
  
