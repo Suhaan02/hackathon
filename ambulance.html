@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AmbulanceIQ — Paramedic Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #ff2d2d;
+    --red-dim: #991a1a;
+    --amber: #ffaa00;
+    --green: #00e676;
+    --cyan: #00e5ff;
+    --bg: #050a0f;
+    --surface: #0a1520;
+    --surface2: #0f1e2e;
+    --border: rgba(0,229,255,0.15);
+    --text: #e0f0ff;
+    --text-dim: #6a8fa8;
+    --font-display: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-body: 'Exo 2', sans-serif;
+  }
+ 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+ 
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(255,45,45,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,229,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+ 
+  .scanline {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+ 
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+ 
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+ 
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+ 
+  .logo-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--red);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    animation: pulse-red 2s infinite;
+    box-shadow: 0 0 20px rgba(255,45,45,0.4);
+  }
+ 
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 20px rgba(255,45,45,0.4); }
+    50% { box-shadow: 0 0 35px rgba(255,45,45,0.7); }
+  }
+ 
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+ 
+  .logo-text span { color: var(--red); }
+ 
+  
