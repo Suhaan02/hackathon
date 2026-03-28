@@ -1,53 +1,56 @@
-const admin = require("firebase-admin");
-const serviceAccount = JSON.parse(process.env.FIREBASE_KEY);
-
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
-});
-
-const db = admin.firestore();
-
+// server.js
 const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
-const cors = require("cors");
+const admin = require("firebase-admin");
+const fs = require("fs");
 
-const app = express();
-app.use(cors());
+// --------------------
+// 1️⃣ Firebase Setup
+// --------------------
+const serviceAccount = JSON.parse(fs.readFileSync("./firebaseKey.json", "utf8"));
 
-const server = http.createServer(app);
-
-const io = new Server(server, {
-  cors: { origin: "*" }
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
 });
 
+const db = admin.firestore();
+console.log("✅ Firebase connected");
+
+// --------------------
+// 2️⃣ Express + Socket.IO Setup
+// --------------------
+const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: { origin: "*" }, // allow all origins for simplicity
+});
+
+// --------------------
+// 3️⃣ Socket.IO events
+// --------------------
 io.on("connection", (socket) => {
-  console.log("Connected:", socket.id);
+  console.log("🟢 New client connected:", socket.id);
 
+  // Receive data from frontend
   socket.on("patientData", async (data) => {
-    try {
-      const newData = {
-        ...data,
-        time: new Date()
-      };
+    console.log("📥 Received data:", data);
 
-      await db.collection("Data").add(newData);
+    // Save to Firebase Firestore
+    const docRef = db.collection("patients").doc();
+    await docRef.set(data);
 
-      io.emit("hospitalUpdate", newData);
-
-      console.log("✅ Data stored:", newData);
-
-    } catch (err) {
-      console.error("❌ Firebase error:", err);
-    }
+    // Broadcast to all connected clients
+    io.emit("hospitalUpdate", data);
   });
 
+  socket.on("disconnect", () => {
+    console.log("🔴 Client disconnected:", socket.id);
+  });
 });
 
+// --------------------
+// 4️⃣ Start server
+// --------------------
 const PORT = process.env.PORT || 3000;
-app.get("/", (req, res) => {
-  res.send("🚑 Ambulance backend is running");
-});
-server.listen(PORT, () => {
-  console.log("Server running on port", PORT);
-});
+server.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
