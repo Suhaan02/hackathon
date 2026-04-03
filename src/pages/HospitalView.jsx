@@ -87,14 +87,21 @@ function HospitalView() {
       {patientData && (
         <>
           {/* ALERT */}
-          <div style={{ background: "#b148480e", border: "1px solid #ff2d2d", padding: "16px", marginBottom: "24px" }}>
-            🚨 INCOMING PATIENT — {patientData.unitId} | ETA: {patientData.eta} min
-          </div>
+          <div style={{ background: '#fff0f0', border: '2px solid #ff2d2d', borderRadius: '12px', padding: '16px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px', boxShadow: '0 4px 12px rgba(255,45,45,0.15)' }}>
+  <span style={{ fontSize: '36px' }}>🚨</span>
+  <div style={{ flex: 1 }}>
+    <div style={{ color: '#ff2d2d', fontWeight: '800', fontSize: '18px', letterSpacing: '1px' }}>INCOMING PATIENT — UNIT {patientData.unitId}</div>
+    <div style={{ color: '#666', fontSize: '13px', marginTop: '4px' }}>ETA: {patientData.eta} minutes · Heading to {patientData.hospital}</div>
+  </div>
+  <div style={{ background: '#ff2d2d', borderRadius: '8px', padding: '10px 18px', fontWeight: '800', fontSize: '14px', letterSpacing: '2px', color: '#fff' }}>
+    🔴 CRITICAL
+  </div>
+</div>
 
           {/* VITALS */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
   {[
-    { icon: '❤️', label: 'Heart Rate', value: patientData.heartRate, unit: 'BPM', color: '#ff2d2d', low: 60, high: 100 },
+    { icon: '❤️', label: 'Heart Rate', value: patientData.heartRate, unit: 'BPM', color: '#ff2d2d', low: 89, high :95 },
     { icon: '🩺', label: 'Blood Pressure', value: patientData.bp, unit: 'mmHg', color: '#0077cc', low: null, high: null },
     { icon: '🫁', label: 'SpO₂', value: patientData.spo2, unit: '%', color: '#00aa55', low: 95, high: 100 },
     { icon: '💓', label: 'Pulse Rate', value: patientData.pulse, unit: 'BPM', color: '#cc7700', low: 60, high: 100 },
@@ -155,6 +162,45 @@ function HospitalView() {
               )}
             </div>
           )}
+          <div style={{ background: '#fffbf0', border: '2px solid #ffaa00', borderRadius: '12px', padding: '20px', marginBottom: '24px', boxShadow: '0 2px 8px rgba(255,170,0,0.15)' }}>
+  
+  <div style={{ fontSize: '12px', color: '#cc8800', letterSpacing: '3px', marginBottom: '16px', fontWeight: '700' }}>🧠 AI PRELIMINARY ANALYSIS</div>
+  
+  <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+    <div style={{ flex: 1, background: '#fff', border: '1px solid #ffaa00', borderRadius: '10px', padding: '14px', textAlign: 'center' }}>
+      <div style={{ fontSize: '11px', color: '#999', marginBottom: '6px' }}>LIKELY CONDITION</div>
+      <div style={{ fontSize: '16px', fontWeight: '800', color: '#ff2d2d' }}>Cardiac Arrest</div>
+    </div>
+    <div style={{ flex: 1, background: '#fff', border: '1px solid #ffaa00', borderRadius: '10px', padding: '14px', textAlign: 'center' }}>
+      <div style={{ fontSize: '11px', color: '#999', marginBottom: '6px' }}>CONFIDENCE</div>
+      <div style={{ fontSize: '16px', fontWeight: '800', color: '#cc8800' }}>87%</div>
+    </div>
+    <div style={{ flex: 1, background: '#fff', border: '1px solid #ffaa00', borderRadius: '10px', padding: '14px', textAlign: 'center' }}>
+      <div style={{ fontSize: '11px', color: '#999', marginBottom: '6px' }}>PRIORITY</div>
+      <div style={{ fontSize: '16px', fontWeight: '800', color: '#ff2d2d' }}>CRITICAL</div>
+    </div>
+  </div>
+
+  <div style={{ fontSize: '13px', color: '#666', marginBottom: '10px', fontWeight: '600' }}>⚡ EQUIPMENT NEEDED:</div>
+  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px', marginBottom: '16px' }}>
+    {['Defibrillator', 'Oxygen Cylinder', 'IV Line Kit', 'Cardiac Monitor'].map((item, i) => (
+      <div key={i} style={{ background: '#fff', border: '1px solid #00aa55', borderRadius: '8px', padding: '10px 14px', fontSize: '13px', color: '#1a1a2e', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <span style={{ color: '#00aa55' }}>✅</span> {item}
+      </div>
+    ))}
+  </div>
+
+  <div style={{ fontSize: '14px', color: '#1a1a2e', marginBottom: '12px', fontWeight: '600' }}>Is your hospital equipped and ready?</div>
+  <div style={{ display: 'flex', gap: '12px' }}>
+    <button style={{ flex: 1, padding: '14px', background: '#00aa55', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: '800', fontSize: '15px', cursor: 'pointer', letterSpacing: '1px' }}>
+      ✅ YES, WE'RE READY
+    </button>
+    <button style={{ flex: 1, padding: '14px', background: '#ff2d2d', border: 'none', borderRadius: '10px', color: '#fff', fontWeight: '800', fontSize: '15px', cursor: 'pointer', letterSpacing: '1px' }}>
+      ❌ NO — REROUTE
+    </button>
+  </div>
+
+</div>
         </>
       )}
     </div>
