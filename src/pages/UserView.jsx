@@ -45,7 +45,7 @@ function UserView() {
       <MapContainer
         center={[12.9716, 77.5946]}
         zoom={14}
-        style={{ height: '100vh', width: '100%' }}
+        style={{ height: '100vh', width: '100%', }}
         zoomControl={false}
       >
         <TileLayer

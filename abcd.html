@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AmbulanceIQ — Paramedic Console</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --red: #ff2d2d;
+    --red-dim: #991a1a;
+    --amber: #ffaa00;
+    --green: #00e676;
+    --cyan: #00e5ff;
+    --bg: #050a0f;
+    --surface: #0a1520;
+    --surface2: #0f1e2e;
+    --border: rgba(0,229,255,0.15);
+    --text: #e0f0ff;
+    --text-dim: #6a8fa8;
+    --font-display: 'Rajdhani', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-body: 'Exo 2', sans-serif;
+  }
+ 
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+ 
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+ 
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgba(255,45,45,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(0,229,255,0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+ 
+  .scanline {
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    pointer-events: none;
+    z-index: 1;
+  }
+ 
+  .container {
+    position: relative;
+    z-index: 2;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 24px 20px;
+  }
+ 
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 32px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+ 
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+ 
+  .logo-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--red);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    animation: pulse-red 2s infinite;
+    box-shadow: 0 0 20px rgba(255,45,45,0.4);
+  }
+ 
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 20px rgba(255,45,45,0.4); }
+    50% { box-shadow: 0 0 35px rgba(255,45,45,0.7); }
+  }
+ 
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fff;
+  }
+ 
+  .logo-text span { color: var(--red); }
+ 
+   .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+ 
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: blink 1.5s infinite;
+  }
+ 
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+ 
+  /* UNIT INFO */
+  .unit-info {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+ 
+  .unit-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+ 
+  .unit-card label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 6px;
+  }
+ 
+  .unit-card input, .unit-card select {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--cyan);
+    width: 100%;
+  }
+  .unit-card select option { background: var(--surface2); color: var(--text); }
+ 
+  /* VITALS GRID */
+  .section-title {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+ 
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+ 
+  .vitals-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+ 
+  .vital-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+ 
+  .vital-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--accent, var(--cyan));
+    opacity: 0.6;
+  }
+ 
+  .vital-card:focus-within {
+    border-color: var(--cyan);
+    box-shadow: 0 0 20px rgba(0,229,255,0.1);
+  }
+ 
+  .vital-icon {
+    font-size: 20px;
+    margin-bottom: 8px;
+    display: block;
+  }
+ 
+  .vital-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+ 
+  .vital-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid rgba(0,229,255,0.2);
+    outline: none;
+    font-family: var(--font-display);
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--text);
+    width: 100%;
+    padding-bottom: 4px;
+    transition: border-color 0.2s;
+  }
+ 
+  .vital-input:focus { border-bottom-color: var(--cyan); }
+ 
+  .vital-unit {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+    display: block;
+  }
+ 
+  .vital-status {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-dim);
+    transition: background 0.3s;
+  }
+   
+  .vital-status.ok { background: var(--green); box-shadow: 0 0 8px var(--green); }
+  .vital-status.warn { background: var(--amber); box-shadow: 0 0 8px var(--amber); }
+  .vital-status.crit { background: var(--red); box-shadow: 0 0 8px var(--red); animation: blink 0.8s infinite; }
+ 
+  /* SEVERITY */
+  .severity-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+ 
+  .sev-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 10px;
+    cursor: pointer;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+ 
+  .sev-btn:hover { border-color: var(--color); color: var(--color); }
+  .sev-btn.active { background: var(--color); color: #000; border-color: var(--color); box-shadow: 0 0 20px var(--color); }
+ 
+  .sev-btn[data-sev="green"] { --color: var(--green); }
+  .sev-btn[data-sev="yellow"] { --color: var(--amber); }
+  .sev-btn[data-sev="orange"] { --color: #ff7700; }
+  .sev-btn[data-sev="red"] { --color: var(--red); }
+ 
+  /* CONDITION */
+  .condition-area {
+    margin-bottom: 28px;
+  }
+ 
+  .condition-textarea {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--text);
+    resize: vertical;
+    min-height: 90px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+ 
+  .condition-textarea:focus { border-color: var(--cyan); }
+  .condition-textarea::placeholder { color: var(--text-dim); }
+ 
+  /* BOTTOM ROW */
+  .bottom-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+ 
+  /* HOSPITAL SELECTOR */
+  .hospital-select {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+ 
+  .hospital-select select {
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--cyan);
+    width: 100%;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+ 
+  .hospital-select select option { background: var(--surface2); }
+ 
+  /* ETA */
+  .eta-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+ 
+  .eta-display {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-top: 8px;
+  }
+ 
+  .eta-num {
+    font-family: var(--font-display);
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1;
+  }
+ 
+  .eta-unit-text {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+ 
+  .eta-slider {
+    width: 100%;
+    margin-top: 10px;
+    accent-color: var(--amber);
+  }
+ 
+  /* SEND BUTTON */
+  .send-btn {
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(135deg, var(--red) 0%, #cc0000 100%);
+    border: none;
+    border-radius: 14px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: #fff;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.1s, box-shadow 0.3s;
+    box-shadow: 0 0 30px rgba(255,45,45,0.4);
+    text-transform: uppercase;
+  }
+ 
+  .send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 40px rgba(255,45,45,0.6);
+  }
+ 
+  .send-btn:active { transform: scale(0.98); }
+ 
+  .send-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%);
+    pointer-events: none;
+  }
+ 
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green);
+    color: #000;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 2px;
+    padding: 14px 32px;
+    border-radius: 40px;
+    z-index: 100;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+ 
+  .toast.show { transform: translateX(-50%) translateY(0); }
+ 
+  /* TIMER */
+  .timer {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 14px;
+    letter-spacing: 2px;
+  }
+ 
+  @media (max-width: 600px) {
+    .vitals-grid { grid-template-columns: repeat(2, 1fr); }
+    .unit-info { grid-template-columns: 1fr; }
+    .bottom-row { grid-template-columns: 1fr; }
+    .severity-row { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+ 
+<div class="container">
+  <!-- HEADER -->
+  <div class="header">
+    <div class="logo">
+      <div class="logo-icon">🚑</div>
+      <div>
+        <div class="logo-text">AMBULANCE<span>IQ</span></div>
+        <div style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:2px;">PARAMEDIC CONSOLE v2.0</div>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="status-dot"></div>
+      <span>LIVE UPLINK</span>
+      <span style="margin-left:12px;" id="clock">--:--:--</span>
+    </div>
+  </div>
+ 
+  <!-- UNIT INFO -->
+  <div class="unit-info">
+    <div class="unit-card">
+      <label>Unit ID</label>
+      <input type="text" value="AMB-047" id="unitId" />
+    </div>
+    <div class="unit-card">
+      <label>Crew Lead</label>
+      <input type="text" placeholder="Paramedic name" id="crewLead" />
+    </div>
+    <div class="unit-card">
+      <label>Patient Age</label>
+      <input type="number" placeholder="Age" id="patientAge" />
+    </div>
+  </div>
+ 
+  <!-- VITALS -->
+  <div class="section-title">Patient Vitals</div>
+  <div class="vitals-grid">
+ 
+    <div class="vital-card" style="--accent:#ff2d2d;">
+      <div class="vital-status" id="s-hr"></div>
+      <span class="vital-icon">❤️</span>
+      <span class="vital-label">Heart Rate</span>
+      <input class="vital-input" type="number" placeholder="72" id="heartRate" oninput="checkVital('heartRate',60,100,'s-hr')" />
+      <span class="vital-unit">BPM</span>
+    </div>
+  <div class="vital-card" style="--accent:#00e5ff;">
+      <div class="vital-status" id="s-bp"></div>
+      <span class="vital-icon">🩺</span>
+      <span class="vital-label">Blood Pressure</span>
+      <input class="vital-input" type="text" placeholder="120/80" id="bp" oninput="checkBP()" />
+      <span class="vital-unit">mmHg (sys/dia)</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#00e676;">
+      <div class="vital-status" id="s-spo2"></div>
+      <span class="vital-icon">🫁</span>
+      <span class="vital-label">SpO₂ (Oxygen)</span>
+      <input class="vital-input" type="number" placeholder="98" id="spo2" oninput="checkVital('spo2',95,100,'s-spo2')" />
+      <span class="vital-unit">%</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ffaa00;">
+      <div class="vital-status" id="s-pulse"></div>
+      <span class="vital-icon">💓</span>
+      <span class="vital-label">Pulse Rate</span>
+      <input class="vital-input" type="number" placeholder="70" id="pulse" oninput="checkVital('pulse',60,100,'s-pulse')" />
+      <span class="vital-unit">BPM</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ff9500;">
+      <div class="vital-status" id="s-temp"></div>
+      <span class="vital-icon">🌡️</span>
+      <span class="vital-label">Body Temp</span>
+      <input class="vital-input" type="number" placeholder="98.6" step="0.1" id="temp" oninput="checkVital('temp',97,99,'s-temp')" />
+      <span class="vital-unit">°F</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#cc44ff;">
+      <div class="vital-status" id="s-rr"></div>
+      <span class="vital-icon">🫀</span>
+      <span class="vital-label">Resp. Rate</span>
+      <input class="vital-input" type="number" placeholder="16" id="respRate" oninput="checkVital('respRate',12,20,'s-rr')" />
+      <span class="vital-unit">breaths/min</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#00e5ff;">
+      <div class="vital-status" id="s-gcs"></div>
+      <span class="vital-icon">🧠</span>
+      <span class="vital-label">GCS Score</span>
+      <input class="vital-input" type="number" placeholder="15" min="3" max="15" id="gcs" oninput="checkVital('gcs',13,15,'s-gcs')" />
+      <span class="vital-unit">/ 15 (consciousness)</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ff2d2d;">
+      <div class="vital-status" id="s-glucose"></div>
+      <span class="vital-icon">🩸</span>
+      <span class="vital-label">Blood Glucose</span>
+      <input class="vital-input" type="number" placeholder="90" id="glucose" oninput="checkVital('glucose',70,140,'s-glucose')" />
+      <span class="vital-unit">mg/dL</span>
+    </div>
+ 
+    <div class="vital-card" style="--accent:#ffaa00;">
+      <div class="vital-status"></div>
+      <span class="vital-icon">⚖️</span>
+      <span class="vital-label">Patient Weight</span>
+      <input class="vital-input" type="number" placeholder="70" id="weight" />
+      <span class="vital-unit">kg</span>
+    </div>
+ 
+  </div>
+ 
+  <!-- SEVERITY -->
+  <div class="section-title">Triage Severity</div>
+  <div class="severity-row" style="margin-bottom:28px;">
+    <div class="sev-btn" data-sev="green" onclick="setSev(this)">🟢 MINOR</div>
+    <div class="sev-btn" data-sev="yellow" onclick="setSev(this)">🟡 DELAYED</div>
+    <div class="sev-btn" data-sev="orange" onclick="setSev(this)">🟠 URGENT</div>
+    <div class="sev-btn" data-sev="red" onclick="setSev(this)">🔴 CRITICAL</div>
+  </div>
+ 
+  <!-- CONDITION -->
+  <div class="section-title">Clinical Notes</div>
+  <div class="condition-area">
+    <textarea class="condition-textarea" id="condition" placeholder="Describe patient condition, symptoms, incident details, medications given en route..."></textarea>
+  </div>
+ 
+  <!-- HOSPITAL + ETA -->
+  <div class="section-title">Dispatch Info</div>
+  <div class="bottom-row">
+    <div class="hospital-select">
+      <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:2px;">TARGET HOSPITAL</label>
+      <select id="hospital">
+        <option>KIMS Hospital, Hubli</option>
+        <option>SDM Medical College</option>
+        <option>Navodaya Medical College</option>
+        <option>ESIC Hospital, Hubli</option>
+        <option>District Hospital, Dharwad</option>
+      </select>
+    </div>
+    <div class="eta-card">
+      <label style="font-family:var(--font-mono);font-size:10px;color:var(--text-dim);letter-spacing:2px;">ETA TO HOSPITAL</label>
+      <div class="eta-display">
+        <span class="eta-num" id="etaDisplay">8</span>
+        <span class="eta-unit-text">MINUTES</span>
+      </div>
+      <input type="range" class="eta-slider" min="1" max="60" value="8" id="etaSlider" oninput="document.getElementById('etaDisplay').textContent=this.value" />
+    </div>
+  </div>
+ 
+  <!-- SEND -->
+  <button class="send-btn" onclick="sendData()">
+    🚨 &nbsp; TRANSMIT TO HOSPITAL
+  </button>
+ 
+  <div class="timer" id="lastSent">LAST TRANSMISSION: —</div>
+</div>
+ 
+<!-- TOAST -->
+<div class="toast" id="toast">✅ &nbsp; DATA TRANSMITTED SUCCESSFULLY</div>
+ 
+<script>
+  let severity = '';
+ 
+  function clock() {
+    const now = new Date();
+    document.getElementById('clock').textContent =
+      now.toTimeString().slice(0,8);
+  }
+  setInterval(clock, 1000); clock();
+ 
+  function setSev(el) {
+    document.querySelectorAll('.sev-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    severity = el.dataset.sev;
+  }
+ 
+  function checkVital(id, low, high, statusId) {
+    const val = parseFloat(document.getElementById(id).value);
+    const el = document.getElementById(statusId);
+    if (!val) { el.className = 'vital-status'; return; }
+    if (val < low * 0.85 || val > high * 1.15) el.className = 'vital-status crit';
+    else if (val < low || val > high) el.className = 'vital-status warn';
+    else el.className = 'vital-status ok';
+  }
+ 
+  function checkBP() {
+    const val = document.getElementById('bp').value;
+    const el = document.getElementById('s-bp');
+    const parts = val.split('/');
+    if (parts.length !== 2) { el.className = 'vital-status'; return; }
+    const sys = parseInt(parts[0]), dia = parseInt(parts[1]);
+    if (sys > 180 || sys < 80 || dia > 120 || dia < 50) el.className = 'vital-status crit';
+    else if (sys > 140 || sys < 90 || dia > 90 || dia < 60) el.className = 'vital-status warn';
+    else el.className = 'vital-status ok';
+  }
+ function sendData() {
+    const data = {
+      unitId: document.getElementById('unitId').value,
+      crewLead: document.getElementById('crewLead').value,
+      patientAge: document.getElementById('patientAge').value,
+      heartRate: document.getElementById('heartRate').value,
+      bp: document.getElementById('bp').value,
+      spo2: document.getElementById('spo2').value,
+      pulse: document.getElementById('pulse').value,
+      temp: document.getElementById('temp').value,
+      respRate: document.getElementById('respRate').value,
+      gcs: document.getElementById('gcs').value,
+      glucose: document.getElementById('glucose').value,
+      weight: document.getElementById('weight').value,
+      severity,
+      condition: document.getElementById('condition').value,
+      hospital: document.getElementById('hospital').value,
+      eta: document.getElementById('etaSlider').value,
+      timestamp: new Date().toISOString()
+    };
+ 
+    localStorage.setItem('ambulanceData', JSON.stringify(data));
+ 
+    const toast = document.getElementById('toast');
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+ 
+    document.getElementById('lastSent').textContent =
+      'LAST TRANSMISSION: ' + new Date().toTimeString().slice(0,8);
+  }
+</script>
+</body>
+</html>

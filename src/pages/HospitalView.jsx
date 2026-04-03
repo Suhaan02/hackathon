@@ -59,7 +59,7 @@ function HospitalView() {
   const patientData = data;
 
   return (
-    <div style={{ background: "#050a0f", minHeight: "100vh", color: "#e0f0ff", padding: "24px" }}>
+    <div style={{ background: "#f5f0e8", minHeight: "100vh", color: "#03080c", padding: "24px" }}>
 
       {/* HEADER */}
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "32px" }}>
@@ -73,7 +73,7 @@ function HospitalView() {
           </div>
         </div>
 
-        <div style={{ fontSize: "12px", color: "#6a8fa8" }}>
+        <div style={{ fontSize: "12px", color: "#031104" }}>
           {patientData
             ? isLive
               ? "🟢 LIVE"
@@ -87,19 +87,41 @@ function HospitalView() {
       {patientData && (
         <>
           {/* ALERT */}
-          <div style={{ background: "#1a0a0a", border: "1px solid #ff2d2d", padding: "16px", marginBottom: "24px" }}>
+          <div style={{ background: "#b148480e", border: "1px solid #ff2d2d", padding: "16px", marginBottom: "24px" }}>
             🚨 INCOMING PATIENT — {patientData.unitId} | ETA: {patientData.eta} min
           </div>
 
           {/* VITALS */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "14px", marginBottom: "24px" }}>
-            <div>❤️ HR: {patientData.heartRate}</div>
-            <div>🩺 BP: {patientData.bp}</div>
-            <div>🫁 SpO₂: {patientData.spo2}%</div>
-            <div>💓 Pulse: {patientData.pulse}</div>
-            <div>🌡 Temp: {patientData.temp}</div>
-            <div>🧠 GCS: {patientData.gcs}</div>
-          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px', marginBottom: '24px' }}>
+  {[
+    { icon: '❤️', label: 'Heart Rate', value: patientData.heartRate, unit: 'BPM', color: '#ff2d2d', low: 60, high: 100 },
+    { icon: '🩺', label: 'Blood Pressure', value: patientData.bp, unit: 'mmHg', color: '#0077cc', low: null, high: null },
+    { icon: '🫁', label: 'SpO₂', value: patientData.spo2, unit: '%', color: '#00aa55', low: 95, high: 100 },
+    { icon: '💓', label: 'Pulse Rate', value: patientData.pulse, unit: 'BPM', color: '#cc7700', low: 60, high: 100 },
+    { icon: '🌡️', label: 'Body Temp', value: patientData.temp, unit: '°F', color: '#ff6600', low: 97, high: 99 },
+    { icon: '🧠', label: 'GCS Score', value: patientData.gcs, unit: '/ 15', color: '#7700cc', low: 13, high: 15 },
+  ].map((vital, i) => {
+    const val = parseFloat(vital.value)
+    const isAbnormal = vital.low !== null && (val < vital.low || val > vital.high)
+    return (
+      <div key={i} style={{
+        background: isAbnormal ? '#fff0f0' : '#ffffff',
+        border: `2px solid ${isAbnormal ? '#ff2d2d' : vital.color}`,
+        borderRadius: '16px',
+        padding: '20px',
+        textAlign: 'center',
+        animation: isAbnormal ? 'blink-border 1s infinite' : 'none',
+        boxShadow: isAbnormal ? '0 0 12px rgba(255,45,45,0.4)' : '0 2px 8px rgba(0,0,0,0.08)'
+      }}>
+        <div style={{ fontSize: '28px', marginBottom: '8px' }}>{vital.icon}</div>
+        <div style={{ fontSize: '13px', color: '#666', marginBottom: '6px', fontWeight: '600' }}>{vital.label}</div>
+        <div style={{ fontSize: '36px', fontWeight: '800', color: isAbnormal ? '#ff2d2d' : vital.color }}>{vital.value}</div>
+        <div style={{ fontSize: '12px', color: '#999', marginTop: '4px' }}>{vital.unit}</div>
+        {isAbnormal && <div style={{ marginTop: '8px', fontSize: '11px', color: '#ff2d2d', fontWeight: '700', letterSpacing: '1px' }}>⚠️ ABNORMAL</div>}
+      </div>
+    )
+  })}
+</div>
 
           {/* NOTES */}
           <div style={{ marginBottom: "24px" }}>

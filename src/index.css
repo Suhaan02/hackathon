@@ -5,3 +5,7 @@
   height: 100%;
   width: 100%;
 }
+@keyframes blink-border {
+  0%, 100% { opacity: 2; }
+  50% { opacity: 0.5; }
+}
